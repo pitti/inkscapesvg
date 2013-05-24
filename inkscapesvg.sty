@@ -1,0 +1,39 @@
+\ProvidesPackage{inkscapesvg}[2013/05/24 loading automatic svg conversion support]
+\RequirePackage{graphicx}
+
+\ifnum\pdfshellescape=1\else
+	\PackageWarning{inkscapesvg}{%
+	write18 command disabled. pdf_tex creation \MessageBreak 
+	from svg is not supported. Try setting \MessageBreak
+	-shell-escape.}
+\fi
+
+
+\makeatletter
+
+\newcommand{\inksvg@forall@graphicspath}[2][\path]{%
+	\@for#1:=\Ginput@path\do{#2}%
+}
+
+\def\includesvg#1{%
+	\ifnum\pdfstrcmp{\pdffilemoddate{#1.svg}}{\pdffilemoddate{#1.pdf}}>0%
+		{%
+		\immediate\write18%
+			{inkscape -z -D --file=#1.svg --export-pdf=#1.pdf --export-latex}
+		}%
+	\fi%
+	\inksvg@forall@graphicspath{%
+		\InputIfFileExists{\path#1.pdf_tex}%
+			{\let\iterate\relax}%
+			{}%
+	}
+}
+
+\def\printgraphicspaths{%
+	\inksvg@forall@graphicspath{Path: \path}
+}
+
+
+\makeatother
+\endinput
+
