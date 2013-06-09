@@ -67,7 +67,7 @@
 % try including the SVG for each token in \Ginput@path
 \def\inksvg@check@all@paths#1{%
   \expandafter\@tfor\expandafter\path@t
-      \expandafter:\expandafter=\Ginput@path\do{%
+      \expandafter:\expandafter=\inksvg@input@path\do{%
       \inksvg@include@svg{\path@t}{#1}%
   }}
 
