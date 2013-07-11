@@ -34,22 +34,33 @@
 \RequirePackage{color}
 \RequirePackage{xkeyval}
 
+\newif\if@inksvg@write@support
+\@inksvg@write@supporttrue
+
+\def\inksvg@error@text{%
+  write18 command disabled. pdf_tex creation \MessageBreak
+  from svg is not supported. Please use \MessageBreak
+  -shell-escape when calling pdflatex.
+}
+
 
 % Print warning when -shell-escape ist not active
 \ifnum\pdfshellescape=1\else
-  \PackageWarning{inkscapesvg}{%
-  write18 command disabled. pdf_tex creation \MessageBreak 
-  from svg is not supported. Try setting \MessageBreak
-  -shell-escape.}
+  \PackageWarning{inkscapesvg}{\inksvg@error@text}
+  \@inksvg@write@supportfalse
 \fi
 
 
 % Call inkscape to convert svg -> pdf/pdf_tex if svg file is newer.
 \newcommand{\inksvg@update@svg@if@newer}[1]{%
   \ifnum\pdfstrcmp{\pdffilemoddate{#1.svg}}{\pdffilemoddate{#1.pdf}}>0{%
-    \immediate\write18%
-      {inkscape -z -D --file=#1.svg --export-pdf=#1.pdf --export-latex}
-    }%
+    \if@inksvg@write@support%
+      \immediate\write18%
+        {inkscape -z -D --file=#1.svg --export-pdf=#1.pdf --export-latex}
+      }%
+    \else
+      \PackageError{inkscapesvg}{\inksvg@error@text}
+    \fi
   \fi}
 
 
