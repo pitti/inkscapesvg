@@ -17,3 +17,6 @@ Usage
 
 \includesvg[width=1.0\textwidth,fsize=\small]{my-svg}
 ```
+
+
+Compile using `pdflatex -shell-escape` to allow invocation of inkscape using the latex command `\write18`.
