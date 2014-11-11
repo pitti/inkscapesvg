@@ -37,6 +37,16 @@
 \newif\if@inksvg@write@support
 \@inksvg@write@supporttrue
 
+\presetkeys{inksvg@keys}{latex=true}{}
+
+\DeclareOption{nolatex}{
+  \presetkeys{inksvg@keys}{latex=false}{}
+}
+
+\ProcessOptions
+
+\define@boolkey{inksvg@keys}[@inksvg@]{latex}[true]{}
+
 \def\inksvg@error@text{%
   write18 command disabled. pdf_tex creation \MessageBreak
   from svg is not supported. Please use \MessageBreak
@@ -56,7 +66,8 @@
   \ifnum\pdfstrcmp{\pdffilemoddate{#1.svg}}{\pdffilemoddate{#1.pdf}}>0{%
     \if@inksvg@write@support%
       \immediate\write18%
-        {inkscape -z -D --file=#1.svg --export-pdf=#1.pdf --export-latex}
+        {inkscape -z -D --file=#1.svg --export-pdf=#1.pdf %
+          \if@inksvg@latex --export-latex \fi}%
       }%
     \else
       \PackageError{inkscapesvg}{\inksvg@error@text}
@@ -71,7 +82,15 @@
 \def\inksvg@include@svg#1#2{%
   \IfFileExists{#1#2.svg}{%
     \inksvg@update@svg@if@newer{#1#2}%
-    \input{#1#2.pdf_tex}%
+    \if@inksvg@latex
+      \input{#1#2.pdf_tex}%
+    \else
+      \ifdefined\svgwidth
+        \includegraphics[\XKV@rm,width=\svgwidth]{#1#2.pdf}%
+      \else
+        \includegraphics[\XKV@rm]{#1#2.pdf}%
+      \fi
+    \fi
     \@inksvg@file@foundtrue%
   }}
 
@@ -94,7 +113,7 @@
 % check for empty \graphicspath and include SVG
 \def\inksvg@include@svg@i[#1]#2{%
   \@inksvg@file@foundfalse%
-  \setkeys{inksvg@keys}{#1}%
+  \setkeys*{inksvg@keys}{#1}%
   \ifx\Ginput@path\@undefined%
     \def\inksvg@input@path{{}}%
   \else%
