@@ -39,6 +39,12 @@
 
 \presetkeys{inksvg@keys}{latex=true}{}
 
+\DeclareOption{nolatex}{
+  \presetkeys{inksvg@keys}{latex=false}{}
+}
+
+\ProcessOptions
+
 \define@boolkey{inksvg@keys}[@inksvg@]{latex}[true]{}
 
 \def\inksvg@error@text{%
