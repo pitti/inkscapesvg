@@ -38,14 +38,20 @@
 \@inksvg@write@supporttrue
 
 \presetkeys{inksvg@keys}{latex=true}{}
+\presetkeys{inksvg@keys}{crop=true}{}
 
 \DeclareOption{nolatex}{
   \presetkeys{inksvg@keys}{latex=false}{}
 }
 
+\DeclareOption{nocrop}{
+  \presetkeys{inksvg@keys}{crop=false}{}
+}
+
 \ProcessOptions
 
 \define@boolkey{inksvg@keys}[@inksvg@]{latex}[true]{}
+\define@boolkey{inksvg@keys}[@inksvg@]{crop}[true]{}
 
 \def\inksvg@error@text{%
   write18 command disabled. pdf_tex creation \MessageBreak
@@ -66,7 +72,9 @@
   \ifnum\pdfstrcmp{\pdffilemoddate{#1.svg}}{\pdffilemoddate{#1.pdf}}>0{%
     \if@inksvg@write@support%
       \immediate\write18%
-        {inkscape -z -D --file=#1.svg --export-pdf=#1.pdf %
+        {inkscape -z %
+          \if@inksvg@crop -D \fi %
+          --file=#1.svg --export-pdf=#1.pdf %
           \if@inksvg@latex --export-latex \fi}%
       }%
     \else
